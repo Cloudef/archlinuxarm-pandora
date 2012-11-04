@@ -1,0 +1,5 @@
+PowerVR SGX ES 5.x hardfp modules and userspace libraries.
+
+# After install
+systemctl enable pvrsgx
+systemctl start pvrsgx
