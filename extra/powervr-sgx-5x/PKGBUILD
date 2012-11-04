@@ -9,7 +9,7 @@ license=('CCPL')
 provides=('powervr-sgx')
 conflicts=('powervr-sgx')
 replaces=('powervr-sgx')
-depends=('systemd' 'devmem')
+depends=('devmem')
 source=("pvr-sgx-hf-$pkgver-pandora.tar.xz"
         'pvrsgxinit'
         'pvrsgx.service'
