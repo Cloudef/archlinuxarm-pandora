@@ -1,0 +1,23 @@
+# Maintainer: Jari Vetoniemi <mailroxas@gmail.com>
+
+pkgname=ti-wl1251-firmware
+pkgdesc="Firmware for TI wl1251 WLAN chip"
+pkgver=0.4
+pkgrel=1
+arch=('armv7h')
+license=('TI Proprietary')
+source=("ti-wl1251-firmware_${pkgver}.tar.bz2")
+md5sums=('a60c25eae0735b42ad1dcaabeeff1928')
+
+package()
+{
+   cd "${srcdir}"
+   tar xf "ti-wl1251-firmware_${pkgver}.tar.bz2"
+   cd "ti-wl1251-firmware-${pkgver}"
+
+   install -dm755 "${pkgdir}/usr/lib/firmware"
+   install -dm755 "${pkgdir}/usr/share/licenses/${pkgname}"
+   install -Dm755 "license.doc" "${pkgdir}/usr/share/licenses/${pkgname}"
+   install -Dm755 "wl1251-fw.bin" "${pkgdir}/usr/lib/firmware/"
+   install -Dm755 "wl1251-nvs.bin" "${pkgdir}/usr/lib/firmware/"
+}
