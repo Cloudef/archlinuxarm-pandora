@@ -1,0 +1,7 @@
+Stripped pndevmapperd with a lot less crap in it, however avoids frying your battery.
+
+# After install
+systemctl enable pandora
+systemctl enable pndevmapperd
+systemctl start pandora
+systemctl start pndevmapperd

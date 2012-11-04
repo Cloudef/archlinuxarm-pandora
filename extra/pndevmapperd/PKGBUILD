@@ -1,0 +1,53 @@
+# Maintainer: Jari Vetoniemi <mailroxas@gmail.com>
+pkgname=pndevmapperd
+pkgver=1.0
+pkgrel=1
+pkgdesc="Stripped version of pndevmapperd"
+arch=('armv7h' 'arm')
+license=('WTFPL')
+source=("pndevmapperd-${pkgver}.tar.xz"
+        'pndevmapperd.service'
+        'pandora.service'
+        'pandorainit')
+
+md5sums=('6a010b7c421e814bda990295e5148a61'
+         'ad9efdbe17b6c6458c7c3b0dd5e57e21'
+         '33ec6ca3c5cfa361ca73b712e7e5c9b5'
+         '84eb1bc806386a4f58da0190ac2e6015')
+
+build() {
+   cd "$srcdir"
+   tar xf "pndevmapperd-${pkgver}.tar.xz"
+   cd "pndevmapperd"
+   make
+}
+
+package() {
+   cd "$srcdir/pndevmapperd"
+
+   install -dm755 "${pkgdir}/usr/lib/pandora"
+   install -dm755 "${pkgdir}/usr/lib/pandora/scripts"
+   install -dm755 "${pkgdir}/usr/lib/pandora/conf"
+   install -dm755 "${pkgdir}/usr/lib/pandora/state"
+   install -dm755 "${pkgdir}/usr/bin"
+   install -dm755 "${pkgdir}/usr/lib/systemd/system"
+   install -dm755 "${pkgdir}/usr/lib/systemd/scripts"
+
+   install -Dm755 "usr/lib/pandora/conf/eventmap" "${pkgdir}/usr/lib/pandora/conf/"
+   for f in usr/lib/pandora/scripts/*; do
+      install -Dm755 "$f" "${pkgdir}/usr/lib/pandora/scripts/"
+   done
+
+   install -Dm755 "pndevmapperd" "${pkgdir}/usr/bin/"
+   install -Dm755 "../pndevmapperd.service" "${pkgdir}/usr/lib/systemd/system/"
+   install -Dm755 "../pandora.service" "${pkgdir}/usr/lib/systemd/system/"
+   install -Dm755 "../pandorainit" "${pkgdir}/usr/lib/systemd/scripts/"
+
+   # defaults
+   echo "35" > "${pkgdir}/usr/lib/pandora/state/brightness.state"
+   echo "105 315 381 431 490 537 579 686 780 837 880 1023" > "${pkgdir}/usr/lib/pandora/state/gamma.state"
+   echo -e "mouse\n124\n7\n7\n20\n20\nmbuttons\n124\n7\n7\n20\n20\n1\n1" > "${pkgdir}/usr/lib/pandora/state/nubs.state"
+   echo "200" > "${pkgdir}/usr/lib/pandora/conf/dirty_expire_centisecs"
+}
+
+# vim: set ts=8 sw=3 tw=0 :

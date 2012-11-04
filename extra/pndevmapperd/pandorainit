@@ -1,0 +1,75 @@
+#!/bin/bash
+
+. /usr/lib/pandora/scripts/op_paths.sh
+
+pndstop() {
+   echo "Saving Pandora specific settings"
+   bright=$(op_brightness_get current)
+   [[ $bright != "0" ]] && echo $bright > "$OP_BRIGHTNESS_STATE"
+   cat $SYSFS_GAMMA > "$OP_GAMMA_STATE"
+   cat -v /proc/pandora/nub0/mode | sed -n '1p' > "$OP_STATE_ROOT"/nubs.state
+   cat -v /proc/pandora/nub0/mouse_sensitivity | sed -n '1p' >> "$OP_STATE_ROOT"/nubs.state
+   cat -v /proc/pandora/nub0/scrollx_sensitivity | sed -n '1p' >> "$OP_STATE_ROOT"/nubs.state
+   cat -v /proc/pandora/nub0/scrolly_sensitivity | sed -n '1p' >> "$OP_STATE_ROOT"/nubs.state
+   cat -v /proc/pandora/nub0/scroll_rate| sed -n '1p' >> "$OP_STATE_ROOT"/nubs.state
+   cat -v /proc/pandora/nub0/mbutton_threshold | sed -n '1p' >> "$OP_STATE_ROOT"/nubs.state
+   cat -v /proc/pandora/nub1/mode | sed -n '1p' >> "$OP_STATE_ROOT"/nubs.state
+   cat -v /proc/pandora/nub1/mouse_sensitivity | sed -n '1p' >> "$OP_STATE_ROOT"/nubs.state
+   cat -v /proc/pandora/nub1/scrollx_sensitivity | sed -n '1p' >> "$OP_STATE_ROOT"/nubs.state
+   cat -v /proc/pandora/nub1/scrolly_sensitivity | sed -n '1p' >> "$OP_STATE_ROOT"/nubs.state
+   cat -v /proc/pandora/nub1/scroll_rate | sed -n '1p' >> "$OP_STATE_ROOT"/nubs.state
+   cat -v /proc/pandora/nub1/mbutton_threshold | sed -n '1p' >> "$OP_STATE_ROOT"/nubs.state
+   cat -v /proc/pandora/nub0/mbutton_delay | sed -n '1p' >> "$OP_STATE_ROOT"/nubs.state
+   cat -v /proc/pandora/nub1/mbutton_delay | sed -n '1p' >> "$OP_STATE_ROOT"/nubs.state
+}
+
+pndstart() {
+   echo "Restoring Pandora specific settings"
+   bright=$(cat "$OP_BRIGHTNESS_STATE")
+   [[ "$bright" -gt "0" ]] && echo $bright > "$SYSFS_BACKLIGHT_BRIGHTNESS"
+   cat "$OP_CONF_ROOT/dirty_expire_centisecs" > /proc/sys/vm/dirty_expire_centisecs
+   cat "$OP_GAMMA_STATE" > $SYSFS_GAMMA
+   sed -n '1p' "$OP_STATE_ROOT"/nubs.state > /proc/pandora/nub0/mode
+   sed -n '2p' "$OP_STATE_ROOT"/nubs.state > /proc/pandora/nub0/mouse_sensitivity
+   sed -n '3p' "$OP_STATE_ROOT"/nubs.state > /proc/pandora/nub0/scrollx_sensitivity
+   sed -n '4p' "$OP_STATE_ROOT"/nubs.state > /proc/pandora/nub0/scrolly_sensitivity
+   sed -n '5p' "$OP_STATE_ROOT"/nubs.state > /proc/pandora/nub0/scroll_rate
+   sed -n '6p' "$OP_STATE_ROOT"/nubs.state > /proc/pandora/nub0/mbutton_threshold
+   sed -n '7p' "$OP_STATE_ROOT"/nubs.state > /proc/pandora/nub1/mode
+   sed -n '8p' "$OP_STATE_ROOT"/nubs.state > /proc/pandora/nub1/mouse_sensitivity
+   sed -n '9p' "$OP_STATE_ROOT"/nubs.state > /proc/pandora/nub1/scrollx_sensitivity
+   sed -n '10p' "$OP_STATE_ROOT"/nubs.state > /proc/pandora/nub1/scrolly_sensitivity
+   sed -n '11p' "$OP_STATE_ROOT"/nubs.state > /proc/pandora/nub1/scroll_rate
+   sed -n '12p' "$OP_STATE_ROOT"/nubs.state > /proc/pandora/nub1/mbutton_threshold
+   sed -n '13p' "$OP_STATE_ROOT"/nubs.state > /proc/pandora/nub0/mbutton_delay
+   sed -n '14p' "$OP_STATE_ROOT"/nubs.state > /proc/pandora/nub1/mbutton_delay
+
+   # set audio powerdown delay (ms)
+   [[ -e /sys/devices/platform/soc-audio/PCM1773/pmdown_time ]] && \
+      echo 60000 > /sys/devices/platform/soc-audio/PCM1773/pmdown_time
+}
+
+case "$1" in
+   start)
+      pndstart
+      ;;
+   stop)
+      pndstop
+      ;;
+   reload)
+      pndstart
+      ;;
+   restart|force-reload)
+      pndstop
+      sleep 1
+      pndstart
+      ;;
+   *)
+      echo "Usage: $0 {start|stop|restart|reload|force-reload}" >&2
+      exit 1
+      ;;
+esac
+
+exit 0
+
+# vim: set ts=8 sw=3 tw=0 :

@@ -1,0 +1,9 @@
+[Unit]
+Description=Stripped pndevmapperd service
+
+[Service]
+Type=forking
+ExecStart=/usr/bin/pndevmapperd -d
+
+[Install]
+WantedBy=multi-user.target
