@@ -1,0 +1,5 @@
+Zramswap aur package for pandora with some fixes.
+
+# After install
+systemctl enable zramswap
+systemctl start zramswap

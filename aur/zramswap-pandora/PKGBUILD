@@ -1,0 +1,31 @@
+# Maintainer: Jari Vetoniemi <mailRoxas@gmail.com>
+# Contributor: ifaigios <ifaigios_at_gmail_dot_com>
+# Contributor: Alyssa Hung <deciare@isisiew.org>
+# Contributor: Matt Brennan
+# Contributor: falconindy
+# Contributor: adee
+# Contributor: mystilleef
+
+pkgname=zramswap-pandora
+pkgver=1
+pkgrel=1
+pkgdesc="Sets up zram-based swap devices on boot"
+arch=('any')
+url="http://en.wikipedia.org/wiki/ZRam"
+license=('GPL')
+provides=('zramswap')
+replaces=('zramswap')
+conflicts=('zramswap')
+install="zramswap.install"
+source=("zramctrl"
+        "zramswap.service"
+        "zramswap.rc.d")
+md5sums=('c8758b5081f4fbef04be83180506ed05'
+         '560b724aaaf50678ed1c902cd1517109'
+         '38de93b6304e523d879ff1fc85e769ce')
+
+package() {
+  install -Dm755 zramswap.rc.d $pkgdir/etc/rc.d/zramswap
+  install -Dm755 zramctrl $pkgdir/usr/lib/systemd/scripts/zramctrl
+  install -Dm644 zramswap.service $pkgdir/usr/lib/systemd/system/zramswap.service
+}
