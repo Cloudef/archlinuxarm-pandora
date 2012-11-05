@@ -1,0 +1,5 @@
+#!/bin/sh
+
+if [ -f "/etc/X11/Xmodmap" ]; then
+   (sleep 5 && /usr/bin/xmodmap "/etc/X11/Xmodmap") &
+fi

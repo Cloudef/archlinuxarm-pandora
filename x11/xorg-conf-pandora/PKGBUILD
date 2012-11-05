@@ -3,21 +3,28 @@
 pkgname=xorg-conf-pandora
 pkgdesc="Xorg configuration for Pandora"
 pkgver=1.0
-pkgrel=1
+pkgrel=2
 arch=('any')
 license=('WTFPL')
-depends=('xorg-server')
-source=('10-evdev-pandora.conf' '20-fbdev-pandora.conf' '99-calibration-pandora.conf')
+install=xorg-conf-pandora.install
+depends=('xorg-server' 'xorg-xmodmap')
+source=('10-evdev-pandora.conf' '20-fbdev-pandora.conf' '99-calibration-pandora.conf'
+        '99-pandora-modmap' 'Xmodmap')
 
 md5sums=('16c235dd8c8fa3b232c032d22cd69ec8'
          'e082c29de88e8643d005fe2908085798'
-         '33e56102c23392ff99443eaa17574479')
+         '33e56102c23392ff99443eaa17574479'
+         '78dfcf2f7fdde98c7c6a34bc8c26546a'
+         'df98811ed0c8d2d29589fefd20e92a51')
 
 package()
 {
    cd "${srcdir}"
    install -dm755 "${pkgdir}/etc/X11/xorg.conf.d"
+   install -dm755 "${pkgdir}/etc/X11/xinit/xinitrc.d"
    install -Dm755 "10-evdev-pandora.conf" "${pkgdir}/etc/X11/xorg.conf.d/"
    install -Dm755 "20-fbdev-pandora.conf" "${pkgdir}/etc/X11/xorg.conf.d/"
    install -Dm755 "99-calibration-pandora.conf" "${pkgdir}/etc/X11/xorg.conf.d/"
+   install -Dm755 "99-pandora-modmap" "${pkgdir}/etc/X11/xinit/xinitrc.d/"
+   install -Dm755 "Xmodmap" "${pkgdir}/etc/X11/"
 }
