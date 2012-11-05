@@ -6,8 +6,12 @@ pkgver=0.4
 pkgrel=1
 arch=('armv7h')
 license=('TI Proprietary')
-source=("ti-wl1251-firmware_${pkgver}.tar.bz2")
-md5sums=('a60c25eae0735b42ad1dcaabeeff1928')
+source=("ti-wl1251-firmware_${pkgver}.tar.bz2"
+        "ti-wl1251-init" "ti-wl1251.service")
+
+md5sums=('a60c25eae0735b42ad1dcaabeeff1928'
+         'a08b67747f6cd91931b8c1735e8addc9'
+         '3b40940e284931584b1844184d1dc943')
 
 package()
 {
@@ -15,9 +19,13 @@ package()
    tar xf "ti-wl1251-firmware_${pkgver}.tar.bz2"
    cd "ti-wl1251-firmware-${pkgver}"
 
+   install -dm755 "${pkgdir}/usr/lib/systemd/system"
+   install -dm755 "${pkgdir}/usr/lib/systemd/scripts"
    install -dm755 "${pkgdir}/usr/lib/firmware"
    install -dm755 "${pkgdir}/usr/share/licenses/${pkgname}"
    install -Dm755 "license.doc" "${pkgdir}/usr/share/licenses/${pkgname}"
    install -Dm755 "wl1251-fw.bin" "${pkgdir}/usr/lib/firmware/"
    install -Dm755 "wl1251-nvs.bin" "${pkgdir}/usr/lib/firmware/"
+   install -Dm755 "../ti-wl1251-init" "${pkgdir}/usr/lib/systemd/scripts/"
+   install -Dm755 "../ti-wl1251.service" "${pkgdir}/usr/lib/systemd/system/"
 }

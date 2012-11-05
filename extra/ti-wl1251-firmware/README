@@ -1,0 +1,5 @@
+TI wl1251 wifi chip firmware
+
+# After install (OPTIONAL: for tx usage led)
+systemctl enable ti-wl1251
+systemctl start ti-wl1251

@@ -1,0 +1,28 @@
+#!/bin/bash
+
+wlstart()
+{
+   echo phy0rx > /sys/class/leds/pandora::wifi/trigger
+}
+
+wlstop()
+{
+   echo none > /sys/class/leds/pandora::wifi/trigger
+}
+
+case $@ in
+   start)
+      wlstart
+      ;;
+   stop)
+      wlstop
+      ;;
+   restart)
+      wlstop
+      wlstart
+      ;;
+   *)
+      echo "$0: start|stop|restart"
+      ;;
+esac
+
