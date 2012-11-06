@@ -6,9 +6,9 @@ pkgrel=1
 pkgdesc="The PowerVR SGX kernel modules and userspace libraries"
 arch=('armv7h')
 license=('CCPL')
-provides=('powervr-sgx')
-conflicts=('powervr-sgx')
-replaces=('powervr-sgx')
+provides=('powervr-sgx' 'libegl' 'libgles')
+conflicts=('powervr-sgx' 'libegl' libgles')
+replaces=('powervr-sgx' 'libegl' libgles')
 depends=('devmem')
 source=("pvr-sgx-hf-$pkgver-pandora.tar.xz"
         'pvrsgxinit'
