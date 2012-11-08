@@ -1,0 +1,3 @@
+mplayer2 with omapfb output.
+Seems to crash on framebuffer, works fine under X.
+Won't bother fixing this since omapfb stuff seems quite unmaintained mess anyways.
