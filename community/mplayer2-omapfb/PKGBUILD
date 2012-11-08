@@ -29,8 +29,10 @@ source=(ftp://ftp.archlinux.org/other/community/mplayer2/mplayer2-$pkgver.tar.xz
 
 md5sums=('53a266106f4c0dd687af3f807727812c'
          '39b7c4df74240fd0099d0e2bc5e05fe2'
-         'fc14a08028af978b74fc0a43d406e544'
-         'b9f7bb0196c587eaf1fcb972cae3c5a4')
+         '2c8c326831feae13bdd7244b83bbcb4d'
+         'df9058339a2241b259085828dab957f0'
+         '42487757c37fe0aced36f53d7795e902'
+         '3f37c04a72ac340f47edd2b3316b49da')
 
 build() {
     cd "${srcdir}"/mplayer2-$pkgver
