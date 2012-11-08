@@ -1,0 +1,72 @@
+# $Id: PKGBUILD 74686 2012-08-02 07:31:37Z bpiotrowski $
+# Maintainer: Jari Vetoniemi <mailroxas@gmail.com>
+# Contributor:  Bartłomiej Piotrowski <nospam@bpiotrowski.pl>
+# Contributor: Martin Panter <vadmium+aur@gmail.com>
+# Contributor: Stéphane Gaudreault <stephane@archlinux.org>
+
+# ALARM: Kevin Mihelich <kevin@archlinuxarm.org>
+#  - removed --enable-runtime-cpudetection - not supported on ARM
+
+pkgname=mplayer2-omapfb
+pkgver=20120729
+pkgrel=1
+pkgdesc="mplayer2 with omapfb video-out"
+arch=('i686' 'x86_64' 'armv7h')
+license=('GPL')
+url="http://www.mplayer2.org/"
+install=$pkgname.install
+depends=('a52dec' 'aalib' 'cdparanoia' 'desktop-file-utils' 'enca' 'faad2' 'ffmpeg' 'fontconfig'
+         'freetype2' 'jack' 'ladspa' 'lame' 'libass' 'libbluray' 'libcaca' 'libcdio' 'libdca' 'libdvdcss'
+         'libdvdnav' 'libdvdread' 'libgl' 'libjpeg' 'libmad' 'libpulse' 'libtheora' 'libvdpau'
+         'libxinerama' 'libxss' 'libxv' 'libxxf86dga' 'libxxf86vm' 'lirc-utils' 'mpg123' 'ncurses' 'sdl' 'ttf-dejavu')
+makedepends=('mesa' 'unzip' 'yasm' 'python')
+backup=('etc/mplayer/codecs.conf' 'etc/mplayer/input.conf')
+provides=('mplayer')
+conflicts=('mplayer')
+options=(!emptydirs)
+source=(ftp://ftp.archlinux.org/other/community/mplayer2/mplayer2-$pkgver.tar.xz
+        yuv.S vo_omapfb.c 0001-vo_omapfb.patch 0002-vo_omapfb.patch vf_lavc.patch)
+
+md5sums=('53a266106f4c0dd687af3f807727812c'
+         '39b7c4df74240fd0099d0e2bc5e05fe2'
+         'fc14a08028af978b74fc0a43d406e544'
+         'b9f7bb0196c587eaf1fcb972cae3c5a4')
+
+build() {
+    cd "${srcdir}"/mplayer2-$pkgver
+
+    sed 's/gmplayer/mplayer/g' -i etc/mplayer.desktop
+    find -type f -exec sed -e 's/python3/python/' -i {} \;
+
+    cp "${srcdir}/yuv.S" "libvo/"
+    cp "${srcdir}/vo_omapfb.c" "libvo/"
+    cp "/usr/src/linux-$(uname -r)/include/linux/omapfb.h" "libvo/"
+
+    patch -p0 < "${srcdir}/vf_lavc.patch"
+    cd "libvo"; patch -p0 < "${srcdir}/0001-vo_omapfb.patch"
+    cd "..";
+
+    ./configure --prefix=/usr --confdir=/etc/mplayer \
+                --enable-translation --language=all \
+                --enable-joystick \
+                --disable-speex \
+                --disable-openal \
+                --disable-libdv \
+                --disable-musepack \
+                --disable-mga
+
+    patch -p0 < "${srcdir}/0002-vo_omapfb.patch"
+    make
+}
+
+package() {
+    cd "${srcdir}"/mplayer2-$pkgver
+
+    make DESTDIR="${pkgdir}" install
+    install -Dm644 etc/{codecs.conf,input.conf,example.conf} "${pkgdir}"/etc/mplayer/
+    install -dm755 "${pkgdir}"/usr/share/mplayer/
+    ln -s /usr/share/fonts/TTF/DejaVuSans.ttf "${pkgdir}"/usr/share/mplayer/subfont.ttf
+
+    install -dm755 "${pkgdir}"/usr/share/applications/
+    install -m 644 etc/mplayer.desktop "${pkgdir}"/usr/share/applications/
+}

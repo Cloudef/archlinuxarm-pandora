@@ -1,0 +1,18 @@
+--- /tmp/makepkg/src/mplayer2-20120729/libvo/video_out.c.orig	2012-11-08 18:17:52.847895432 +0200
++++ video_out.c	2012-11-08 18:21:34.000000000 +0200
+@@ -94,6 +94,7 @@
+ extern struct vo_driver video_out_bl;
+ extern struct vo_driver video_out_fbdev;
+ extern struct vo_driver video_out_fbdev2;
++extern struct vo_driver video_out_omapfb;
+ extern struct vo_driver video_out_svga;
+ extern struct vo_driver video_out_png;
+ extern struct vo_driver video_out_ggi;
+@@ -192,6 +193,7 @@
+ #ifdef CONFIG_FBDEV
+         &video_out_fbdev,
+         &video_out_fbdev2,
++        &video_out_omapfb,
+ #endif
+ #ifdef CONFIG_SVGALIB
+         &video_out_svga,
