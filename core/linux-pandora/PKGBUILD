@@ -16,7 +16,7 @@ license=('GPL2')
 makedepends=('xmlto' 'docbook-xsl' 'uboot-mkimage' 'git' 'make')
 options=('!strip')
 source=('boot.txt')
-md5sums=('59910271e250fb5a748edbd4c4f19559')
+md5sums=('49159bb48975e4e10908c7ad0b66b46a')
 
 build() {
    [[ -d "${srcdir}/pandora-kernel" ]] || {
@@ -66,6 +66,7 @@ package_linux-pandora() {
    provides=("linux=${pkgver}")
    conflicts=('kernel26' 'linux')
    replaces=('kernel26')
+   backup=('boot.txt')
    install=${pkgname}.install
 
    cd "${srcdir}/pandora-kernel"
