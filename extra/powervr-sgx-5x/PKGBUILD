@@ -2,7 +2,7 @@
 _esrev=5
 pkgname=powervr-sgx-5x
 pkgver=4.8.0.1
-pkgrel=1
+pkgrel=2
 pkgdesc="The PowerVR SGX kernel modules and userspace libraries"
 arch=('armv7h')
 license=('CCPL')
@@ -10,41 +10,47 @@ provides=('powervr-sgx' 'libegl' 'libgles')
 conflicts=('powervr-sgx' 'libegl' libgles')
 replaces=('powervr-sgx' 'libegl' libgles')
 depends=('devmem')
-source=("pvr-sgx-hf-$pkgver-pandora.tar.xz"
+source=("sgx-$pkgver.tar.xz"
         'pvrsgxinit'
         'pvrsgx.service'
         'powervr.ini')
 
-md5sums=('09f21ffa9192ac476c28b0a4b524b23d'
+md5sums=('7ce08af4baa644103afc9d0787bbe5cb'
          '222d8af7293e45ed7375bab0060c1c72'
          '1e007991d0efedd3953286b4874ebdd2'
          '841fc877d049e4641d6cd8a7c12014be')
 
 package() {
    cd "$srcdir"
-   tar xf "pvr-sgx-hf-$pkgver-pandora.tar.xz"
+   tar xf "sgx-${pkgver}.tar.xz"
    install -dm755 "${pkgdir}/usr/lib/modules/$(uname -r)/kernel/drivers/gpu/pvr"
    install -dm755 "${pkgdir}/usr/lib"
    install -dm755 "${pkgdir}/usr/bin"
+   install -dm755 "${pkgdir}/usr/include"
    install -dm755 "${pkgdir}/etc"
    install -dm755 "${pkgdir}/usr/lib/systemd/system"
    install -dm755 "${pkgdir}/usr/lib/systemd/scripts"
 
    # install kernel modules
    for f in pvrsrvkm.ko omaplfb.ko bufferclass_ti.ko; do
-      install -Dm755 "gfx_rel_es${_esrev}.x/$f" "${pkgdir}/usr/lib/modules/$(uname -r)/kernel/drivers/gpu/pvr/"
+      install -Dm755 "sgx-${pkgver}/$f" "${pkgdir}/usr/lib/modules/$(uname -r)/kernel/drivers/gpu/pvr/"
    done
 
    # install userspace libraries
    for f in libGLES_CM.so libGLESv2.so libusc.so libglslcompiler.so libIMGegl.so libEGL.so libpvr2d.so \
       libpvrPVR2D_BLITWSEGL.so libpvrPVR2D_DRIWSEGL.so libpvrPVR2D_FLIPWSEGL.so libpvrPVR2D_FRONTWSEGL.so \
       libpvrPVR2D_LINUXFBWSEGL.so libpvrEWS_WSEGL.so libsrv_um.so libsrv_init.so libPVRScopeServices.so; do
-      install -Dm755 "gfx_rel_es${_esrev}.x/$f" "${pkgdir}/usr/lib/"
+      install -Dm755 "sgx-${pkgver}/$f" "${pkgdir}/usr/lib/"
    done
 
    # install userspace binaries
    for f in pvrsrvctl sgx_init_test eglinfo services_test; do
-      install -Dm755 "gfx_rel_es${_esrev}.x/$f" "${pkgdir}/usr/bin/"
+      install -Dm755 "sgx-${pkgver}/$f" "${pkgdir}/usr/bin/"
+   done
+
+   # install header files
+   for i in sgx-${pkgver}/include/*; do
+      cp -r "$i" "${pkgdir}/usr/include/"
    done
 
    # install default configuration and systemd services
