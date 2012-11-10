@@ -15,7 +15,7 @@ source=("sgx-$pkgver.tar.xz"
         'pvrsgx.service'
         'powervr.ini')
 
-md5sums=('7ce08af4baa644103afc9d0787bbe5cb'
+md5sums=('abf756e2f1401b9f6242ea86d859eaf0'
          '222d8af7293e45ed7375bab0060c1c72'
          '1e007991d0efedd3953286b4874ebdd2'
          '841fc877d049e4641d6cd8a7c12014be')
