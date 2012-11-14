@@ -44,6 +44,11 @@ pndstart() {
    sed -n '13p' "$OP_STATE_ROOT"/nubs.state > /proc/pandora/nub0/mbutton_delay
    sed -n '14p' "$OP_STATE_ROOT"/nubs.state > /proc/pandora/nub1/mbutton_delay
 
+   # even though the above script restores these
+   # I prefer my nubs to always be on mouse, mousebutton state @ startup
+   echo mouse    > /proc/pandora/nub0/mode
+   echo mbuttons > /proc/pandora/nub1/mode
+
    # set audio powerdown delay (ms)
    [[ -e /sys/devices/platform/soc-audio/PCM1773/pmdown_time ]] && \
       echo 60000 > /sys/devices/platform/soc-audio/PCM1773/pmdown_time
