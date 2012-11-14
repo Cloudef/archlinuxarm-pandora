@@ -1,0 +1,181 @@
+From 90eb1d7aa726b3e6a3bf5bd80e3127bbae90d325 Mon Sep 17 00:00:00 2001
+From: Jari Vetoniemi <mailroxas@gmail.com>
+Date: Tue, 13 Nov 2012 22:11:44 +0200
+Subject: [PATCH] Fix for ABI 13
+
+---
+ src/omapfb-driver.c | 49 +++++++++++++++++++++++++------------------------
+ 1 file changed, 25 insertions(+), 24 deletions(-)
+
+diff --git a/src/omapfb-driver.c b/src/omapfb-driver.c
+index 018e040..f51d539 100644
+--- a/src/omapfb-driver.c
++++ b/src/omapfb-driver.c
+@@ -69,17 +69,17 @@
+ 
+ static Bool OMAPFBProbe(DriverPtr drv, int flags);
+ static Bool OMAPFBPreInit(ScrnInfoPtr pScrn, int flags);
+-static Bool OMAPFBScreenInit(int scrnIndex, ScreenPtr pScreen, int argc, char **argv);
+-static Bool OMAPFBEnterVT(int scrnIndex, int flags);
+-static void OMAPFBLeaveVT(int scrnIndex, int flags);
+-static Bool OMAPFBSwitchMode(int scrnIndex, DisplayModePtr mode, int flags);
++static Bool OMAPFBScreenInit(ScreenPtr pScreen, int argc, char **argv);
++static Bool OMAPFBEnterVT(ScrnInfoPtr pScrn);
++static void OMAPFBLeaveVT(ScrnInfoPtr pScrn);
++static Bool OMAPFBSwitchMode(ScrnInfoPtr pScrn, DisplayModePtr mode);
+ 
+ static Bool
+ OMAPFBEnsureRec(ScrnInfoPtr pScrn)
+ {
+ 	if (pScrn->driverPrivate != NULL)
+ 		return TRUE;
+-	
++
+ 	pScrn->driverPrivate = xnfcalloc(sizeof(OMAPFBRec), 1);
+ 	return TRUE;
+ }
+@@ -290,20 +290,20 @@ OMAPFBPreInit(ScrnInfoPtr pScrn, int flags)
+ 	struct stat st;
+ 
+ 	if (flags & PROBE_DETECT) return FALSE;
+-	
++
+ 	/* We only support single entity */
+ 	if (pScrn->numEntities != 1)
+ 		return FALSE;
+-	
++
+ 	/* Setup the configured monitor */
+ 	pScrn->monitor = pScrn->confScreen->monitor;
+-	
++
+ 	/* Get our private data */
+ 	OMAPFBEnsureRec(pScrn);
+ 	ofb = OMAPFB(pScrn);
+ 
+ 	pEnt = xf86GetEntityInfo(pScrn->entityList[0]);
+-	
++
+ 	/* Open the device node */
+ 	ofb->fd = open(ofb->fb_path, O_RDWR, 0);
+ 	if (ofb->fd == -1) {
+@@ -357,7 +357,7 @@ OMAPFBPreInit(ScrnInfoPtr pScrn, int flags)
+ 		OMAPFBFreeRec(pScrn);
+ 		return FALSE;
+ 	}
+-	
++
+ 	if (!xf86SetDepthBpp(pScrn,
+ 			     0, /* depth: overall server default */
+ 			     ofb->state_info.bits_per_pixel,
+@@ -378,7 +378,7 @@ OMAPFBPreInit(ScrnInfoPtr pScrn, int flags)
+ 
+ 	pScrn->progClock = TRUE;
+ 	pScrn->chipset   = "omapfb";
+-	
++
+ 	/* Start with configured virtual size */
+ 	pScrn->virtualX = pScrn->display->virtualX;
+ 	pScrn->virtualY = pScrn->display->virtualY;
+@@ -389,7 +389,7 @@ OMAPFBPreInit(ScrnInfoPtr pScrn, int flags)
+ 		pScrn->virtualX = ofb->state_info.xres_virtual;
+ 	if (pScrn->virtualY < ofb->state_info.yres_virtual)
+ 		pScrn->virtualY = ofb->state_info.yres_virtual;
+-	
++
+ 	/* Setup viewport */
+ 	pScrn->frameX0 = 0;
+ 	pScrn->frameY0 = 0;
+@@ -433,7 +433,7 @@ OMAPFBPreInit(ScrnInfoPtr pScrn, int flags)
+ 	xf86DisableUnusedFunctions(pScrn);
+ 
+ 	xf86PrintModes(pScrn);
+-	
++
+ 	/* Set the screen dpi value (we don't give defaults) */
+ 	xf86SetDpi(pScrn, 0, 0);
+ 
+@@ -475,7 +475,7 @@ OMAPFBXvScreenInit(ScreenPtr pScreen)
+ }
+ 
+ static Bool
+-OMAPFBCloseScreen(int scrnIndex, ScreenPtr pScreen)
++OMAPFBCloseScreen(ScreenPtr pScreen)
+ {
+ 	ScrnInfoPtr pScrn = xf86Screens[pScreen->myNum];
+ 	OMAPFBPtr ofb = OMAPFB(pScrn);
+@@ -483,16 +483,17 @@ OMAPFBCloseScreen(int scrnIndex, ScreenPtr pScreen)
+ 	munmap(ofb->fb, ofb->mem_info.size);
+ 
+ 	pScreen->CloseScreen = ofb->CloseScreen;
+-	
+-	return (*pScreen->CloseScreen)(scrnIndex, pScreen);
++
++	return (*pScreen->CloseScreen)(pScreen);
+ }
+ 
+ static Bool
+-OMAPFBScreenInit(int scrnIndex, ScreenPtr pScreen, int argc, char **argv)
++OMAPFBScreenInit(ScreenPtr pScreen, int argc, char **argv)
+ {
+ 	ScrnInfoPtr pScrn = xf86Screens[pScreen->myNum];
+ 	OMAPFBPtr ofb = OMAPFB(pScrn);
+ 
++        int scrnIndex = 0;
+ 	ofb->CloseScreen = pScreen->CloseScreen;
+ 	pScreen->CloseScreen = OMAPFBCloseScreen;
+ 
+@@ -519,7 +520,7 @@ OMAPFBScreenInit(int scrnIndex, ScreenPtr pScreen, int argc, char **argv)
+ 
+ 	/* Set up pixmap depth information */
+ 	if (!miSetPixmapDepths()) {
+-		xf86DrvMsg(scrnIndex,X_ERROR,"pixmap depth setup failed\n");
++		xf86DrvMsg(scrnIndex, X_ERROR,"pixmap depth setup failed\n");
+ 		return FALSE;
+ 	}
+ 
+@@ -555,10 +556,10 @@ OMAPFBScreenInit(int scrnIndex, ScreenPtr pScreen, int argc, char **argv)
+ 		xf86DrvMsg(scrnIndex, X_ERROR, "fbPictureInit failed\n");
+ 		return FALSE;
+ 	}
+-	
++
+ 	/* Setup default colors */
+ 	xf86SetBlackWhitePixels(pScreen);
+-	
++
+ 	/* Initialize software cursor */
+ 	miDCInitialize(pScreen, xf86GetPointerScreenFuncs());
+ 
+@@ -625,9 +626,9 @@ OMAPFBScreenInit(int scrnIndex, ScreenPtr pScreen, int argc, char **argv)
+ 	return TRUE;
+ }
+ 
+-static Bool OMAPFBSwitchMode(int scrnIndex, DisplayModePtr mode, int flags)
++static Bool OMAPFBSwitchMode(ScrnInfoPtr pScrn, DisplayModePtr mode)
+ {
+-	return xf86SetSingleMode (xf86Screens[scrnIndex], mode, RR_Rotate_0);
++	return xf86SetSingleMode (xf86Screens[pScrn->scrnIndex], mode, RR_Rotate_0);
+ }
+ 
+ void
+@@ -679,14 +680,14 @@ OMAPFBPrintCapabilities(ScrnInfoPtr pScrn,
+ /*** Unimplemented: */
+ 
+ static Bool
+-OMAPFBEnterVT(int scrnIndex, int flags)
++OMAPFBEnterVT(ScrnInfoPtr pScrn)
+ {
+ 	xf86Msg(X_NOT_IMPLEMENTED, "%s\n", __FUNCTION__);
+ 	return TRUE;
+ }
+ 
+ static void
+-OMAPFBLeaveVT(int scrnIndex, int flags)
++OMAPFBLeaveVT(ScrnInfoPtr pScrn)
+ {
+ 	xf86Msg(X_NOT_IMPLEMENTED, "%s\n", __FUNCTION__);
+ }
+-- 
+1.8.0
+

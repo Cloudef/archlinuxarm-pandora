@@ -1,0 +1,7 @@
+xf86-video-omapfb-pandora
+Contains ugly patch to compile for ABI 13
+
+Even though it's called NEON optimized, it really doesn't do much,
+expect that it gives us the Xv output.
+
+Will switch to omapdrm and xf86-video-omap when new kernel available.

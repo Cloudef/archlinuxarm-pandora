@@ -1,0 +1,63 @@
+# Maintainer: Jari Vetoniemi <mailroxas@gmail.com>
+# Contributor: Kevin Mihelich <kevin@plugapps.com>
+
+# OMAP FrameBuffer driver for Xorg
+
+buildarch=4
+
+pkgname=xf86-video-omapfb-pandora
+pkgver=20121114
+pkgrel=1
+pkgdesc="OMAP3+ NEON optimized framebuffer driver for X"
+arch=('armv7h')
+url="http://gitweb.pingu.fi/?p=xf86-video-omapfb.git"
+license=('GPL2')
+provides=(xf86-video-omapfb)
+replaces=(xf86-video-omapfb)
+conflicts=(xf86-video-omapfb)
+makedepends=('pkgconfig' 'xorg-server-devel' 'resourceproto' 'scrnsaverproto')
+options=('!libtool')
+source=("0001-Fix-for-ABI-13.patch"
+        "0001-blacklist-tv-out.patch"
+        "omap-force-plain-mode.patch"
+        "omap-revert-set-virtual-size.patch")
+
+_gitroot="http://git.pingu.fi/xf86-video-omapfb"
+_gitname="xf86-video-omapfb"
+
+md5sums=('7de2dacf784d9766400e7db82648f93d'
+         'e65336e4574029b318845bf9905dc2a4'
+         '6dd4433c91345f029e232dd86d6304c6'
+         'd22370409a26ddc23ba8644401d36d2d')
+
+build() {
+   msg "Connecting to git.freedesktop.org GIT server...."
+
+   if [ -d ${srcdir}/$_gitname ] ; then
+      cd $_gitname && git pull origin
+      msg "The local files are updated."
+   else
+      git clone $_gitroot $_gitname
+   fi
+
+   msg "GIT checkout done or server timeout"
+   msg "Starting make..."
+
+   cd ${srcdir}/$_gitname
+   ./autogen.sh
+   ./configure --prefix=/usr --enable-neon
+   # NOTE: needs -mfpu=neon
+
+   patch -p1 < ${srcdir}/0001-Fix-for-ABI-13.patch
+   patch -p1 < ${srcdir}/0001-blacklist-tv-out.patch
+   patch -p1 < ${srcdir}/omap-force-plain-mode.patch
+   patch -p1 < ${srcdir}/omap-revert-set-virtual-size.patch
+   make
+}
+
+package() {
+   cd "${srcdir}/$_gitname"
+   make DESTDIR="${pkgdir}" install
+}
+
+# vim: set ts=8 sw=3 tw=0 :
