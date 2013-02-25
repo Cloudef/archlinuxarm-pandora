@@ -2,7 +2,7 @@
 Description=TI wl1251 network usage led service
 
 [Service]
-type=oneshot
+Type=oneshot
 ExecStart=/usr/lib/systemd/scripts/ti-wl1251-init start
 ExecStop=/usr/lib/systemd/scripts/ti-wl1251-init stop
 TimeoutSec=0

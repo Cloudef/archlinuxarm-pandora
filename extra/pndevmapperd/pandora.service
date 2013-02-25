@@ -2,7 +2,7 @@
 Description=Pandora init service
 
 [Service]
-type=oneshot
+Type=oneshot
 ExecStart=/usr/lib/systemd/scripts/pandorainit start
 ExecStop=/usr/lib/systemd/scripts/pandorainit stop
 TimeoutSec=0

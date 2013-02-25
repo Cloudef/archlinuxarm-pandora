@@ -2,7 +2,7 @@
 Description=PowerVR SGX init service
 
 [Service]
-type=oneshot
+Type=oneshot
 ExecStart=/usr/lib/systemd/scripts/pvrsgxinit start
 ExecStop=/usr/lib/systemd/scripts/pvrsgxinit stop
 TimeoutSec=0
