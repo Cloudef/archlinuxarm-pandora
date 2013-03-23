@@ -11,7 +11,7 @@ pkgbase=mesa
 pkgname=('mesa' 'mesa-libgl')
 pkgver=9.1.1
 pkgrel=1
-arch=('i686' 'x86_64')
+arch=('i686' 'x86_64' 'armv7h')
 makedepends=('python2' 'libxml2' 'libx11' 'glproto' 'libdrm' 'dri2proto' 'libxxf86vm' 'libxdamage'
              'libvdpau' 'wayland')
 url="http://mesa3d.sourceforge.net"
@@ -48,7 +48,6 @@ build() {
     --enable-dri \
     --enable-glx \
     --enable-osmesa \
-    --enable-gles1 \
     --enable-texture-float \
     --enable-xa
     # --help
@@ -64,9 +63,9 @@ package_mesa() {
   pkgdesc="an open-source implementation of the OpenGL specification"
   depends=('libdrm' 'libvdpau' 'wayland' 'libxxf86vm' 'libxdamage' 'systemd')
   optdepends=('opengl-man-pages: for the OpenGL API man pages')
-  provides=('libglapi' 'osmesa' 'libgbm' 'libgles' 'khrplatform-devel')
+  provides=('libglapi' 'osmesa' 'libgbm')
   conflicts=('libglapi' 'osmesa' 'libgbm')
-  replaces=('libglapi' 'osmesa' 'libgbm' 'libgles' 'khrplatform-devel')
+  replaces=('libglapi' 'osmesa' 'libgbm')
 
   mv -v ${srcdir}/fakeinstall/* ${pkgdir}
   # rename libgl.so to not conflict with blobs - may break gl.pc ?
@@ -75,7 +74,8 @@ package_mesa() {
 
   install -m755 -d "${pkgdir}/usr/share/licenses/mesa"
   install -m644 "${srcdir}/LICENSE" "${pkgdir}/usr/share/licenses/mesa/"
-
+  rm -r "${pkgdir}/usr/include"/{KHR,EGL}
+  rm "${pkgdir}/usr/lib/libEGL.so" 
 }
 
 package_mesa-libgl() {
